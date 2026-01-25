@@ -38,6 +38,7 @@ on:
 
   deploy:
     needs: build
+    if: ${{ github.ref_name == 'trunk' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v5
