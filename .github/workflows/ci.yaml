@@ -26,7 +26,6 @@ jobs:
     needs: build
     name: Upload to Itch
     runs-on: ubuntu-latest
-    name: Deploy - Itch.io Web
     steps:
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
