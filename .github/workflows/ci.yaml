@@ -38,4 +38,4 @@ jobs:
           itchUsername: ${{secrets.ITCH_USERNAME}}
           itchGameId: virtual-startup
           buildChannel: web
-          buildNumber: $VERSION
+          buildNumber: ${{ github.sha }}
