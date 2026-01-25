@@ -1,0 +1,41 @@
+name: CI/CD
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: install tic80
+        run: |
+          sudo apt update && sudo apt -y install build-essential cmake git libpipewire-0.3-dev libwayland-dev libsdl2-dev ruby-dev libcurl4-openssl-dev libglvnd-dev libglu1-mesa-dev freeglut3-dev
+          git clone --recursive https://github.com/nesbox/TIC-80 && cd TIC-80/build
+          cmake -DBUILD_SDLGPU=On -DBUILD_WITH_ALL=On -DBUILD_STATIC=On -DBUILD_PRO=On .. && cmake --build . --parallel
+          sudo make install
+      - name: export
+        run: |
+          tic80 --fs . --cmd="load pet/pet.fnl" --cli
+          tic80 --fs . --cmd="export html pet/pet.fnl alone=1" --cli
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-zip
+          path: pet/pet.fnl.zip
+
+  deploy:
+    needs: build
+    if: ${{ github.ref_name == 'trunk' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: web-zip
+      - uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerApiKey: ${{secrets.BUTLER_API_KEY}}
+          gameData: pet.fnl.zip
+          itchUsername: ${{secrets.ITCH_USERNAME}}
+          itchGameId: virtual-startup
+          buildChannel: web
+          buildNumber: $VERSION
