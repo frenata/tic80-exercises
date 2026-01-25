@@ -32,6 +32,6 @@ jobs:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
           gameData: pet.fnl.zip
           itchUsername: ${{secrets.ITCH_USERNAME}}
-          itchGameId: '4228853'
+          itchGameId: virtual-startup
           buildChannel: web
           buildNumber: $VERSION
