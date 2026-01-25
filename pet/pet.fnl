@@ -16,16 +16,33 @@
 ;; Utilities
 (fn trib [{: x : y : w : h : border : bgc : col}]
   (let [border (or border 2)
-               bgc (or bgc 0)]
-    (tri x y
-         (+ x w) y
-         (+ x (/ w 2)) (+ y h)
-         col)
+        bgc    (or bgc 0)
+        col    (or col C)
+        y-dir  (if (> 0 h) 1 -1)]
 
-    (tri (+ x (* border 2.5)) (+ y border)
-         (- (+ x w) (* border 2.5)) (+ y border)
-         (+ x (/ w 2)) (- (+ y h) (* border 2))
-         bgc)))
+    (tri 
+      (- x (// w 2)) 
+      (- y (// h 2))
+
+      (+ x (// w 2)) 
+      (- y (// h 2))
+
+      x 
+      (+ y (// h 2))
+
+      col)
+
+    (tri 
+      (- x (// w 2) (* border -2.5)) 
+      (- y (// h 2) (* y-dir border))
+
+      (+ x (// w 2) (* border -2.5)) 
+      (- y (// h 2) (* y-dir border))
+
+      x 
+      (+ y (// h 2) (* 2 y-dir border))
+
+      bgc)))
 
 (fn min-by [vals f def]
   (let [res 
@@ -77,8 +94,7 @@
                 ]
     (shape x y (+ 4 (* 6 (length text))) 10 C)
     (print text (+ x 2) (+ y 2) C true)
-    (action)
-    ))
+    (action)))
 
 
 (fn left-panel []
@@ -86,11 +102,10 @@
   (print "Digi" 5 5 C false 2)
   (print "Tec" 5 17 C false 2)
 
-  ;; Info
-  (print (needs:state)
-         5 60 C)
+  ;; Message
+  (print (needs:state) 5 60 C)
 
-  ;; Player UI
+  ;; Player Buttons
   (button 5 90 "Hire (z)" 26 (fn [] 
                                (trace "Hire")
                                (needs:add :people)))
@@ -99,13 +114,32 @@
                                     (needs:add :pmf)))
   (button 5 120 "Fundraise (c)" 3 (fn [] 
                                     (trace "Fundraise")
-                                    (needs:add :funds)))
-  )
+                                    (needs:add :funds))))
+
+(fn logo [state]
+  (trib {:col C :x 140 :y 80 :w 180 :h 100})
+
+  (let [mouth (case state
+                :under-hired {:w 50 :h 8}
+                :bad-product {:w 30 :h -30}
+                :broke       {:w 50 :h -50}
+                :healthy     {:w 30 :h 30}
+                )]
+    (trib {:x 140 :y 90 :w mouth.w :h mouth.h}))
+
+
+  (let [eyes (case state
+                :under-hired {:w 30 :h 5}
+                :bad-product {:w 10 :h 10}
+                :broke       {:w 30 :h -30}
+                :healthy     {:w 30 :h 20}
+                )]
+    (trib {:x 90 :y 50 :w eyes.w :h eyes.h})
+    (trib {:x 190 :y 50 :w eyes.w :h eyes.h})))
 
 (fn right-panel []
-  (trib {:col C :x 50 :y 30 :w 180 :h 100})
-  (needs:render)
-  )
+  (logo (needs:state))
+  (needs:render))
 
 (var t 0)
 (fn _G.TIC []
