@@ -149,6 +149,10 @@
 
   (if (needs:failed?)
       (print "Failure!" (- (// W 2) 20) (// H 2) C)
+
+      (> t 60000)
+      (print "Unicorn!" (- (// W 2) 20) (// H 2) C)
+
       (do
         (left-panel)
         (right-panel)
