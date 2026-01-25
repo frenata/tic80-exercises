@@ -15,6 +15,7 @@
 
 ;; Utilities
 (fn trib [{: x : y : w : h : border : bgc : col}]
+  "Print an isoceles triangle centered on x,y"
   (let [border (or border 2)
         bgc    (or bgc 0)
         col    (or col C)
@@ -44,9 +45,10 @@
 
       bgc)))
 
-(fn min-by [vals f def]
+(fn min-by [vals f default]
+  "Find the minimum value after applying the function f."
   (let [res 
-         (accumulate [min def
+         (accumulate [min default
                       _ k (ipairs vals)]
            (if (< (f k) min.v) 
                {:v (f k) :k k} 
@@ -54,12 +56,15 @@
     res.k))
 
 ;; State Management
+(var phase :start)
+(var t 0)
 (local needs 
        {:reset (fn [self]
-                (set self.people 20)
-                (set self.pmf 40)
-                (set self.funds 80)
-                (set self.over-cared 0))
+                 (sfx 1 "D-6")
+                 (set self.people 20)
+                 (set self.pmf 40)
+                 (set self.funds 80)
+                 (set self.over-cared 0))
        :loss (fn [self] 
                (let [rate (if (> self.over-cared 0) 3 1)]
                  (when (> self.over-cared 0) (set self.over-cared (- self.over-cared 1)))
@@ -83,8 +88,9 @@
               (let [inc (or val? 30)
                     new-val (+ (. self need) inc)]
                 (when (> new-val 100)
+                  (sfx 2 "E-5")
                   (set self.over-cared 5)
-                  (cls 1))
+                  (cls C))
                 (set (. self need)
                      (math.min 100 (+ (. self need) inc)))
                 ))
@@ -95,21 +101,19 @@
                   :people :under-hired
                   :pmf    :bad-product
                   :funds  :broke
-                  _ :healthy))
-       })
+                  _ :healthy))})
 
+;; UI Elements
 (fn button [x y text key f]
-  (let [pressed (keyp key 60 60)
-                shape (if pressed rect rectb)
-                action (if pressed f (fn []))
-                ]
+  (let [pressed? (keyp key 60 60)
+                shape (if pressed? rect rectb)]
     (shape x y (+ 4 (* 6 (length text))) 10 C)
     (print text (+ x 2) (+ y 2) C true)
-    (action)))
-
+    (when pressed?
+      (f)
+      (sfx 3 "E-1" 20 1 8))))
 
 (fn left-panel []
-
   ;; Message
   (print (needs:state) 5 60 C)
 
@@ -153,9 +157,13 @@
   (print msg 
          (- (// W 2) (// (* (length msg) 6) 2)) (- (// H 2) 20) C)
   (print sub-msg 
-         (- (// W 2) (// (* (length sub-msg) 6) 2)) (- (// H 2) 10) C))
+         (- (// W 2) (// (* (length sub-msg) 6) 2)) (- (// H 2) 10) C)
 
-(var t 0)
+  (when (keyp 48)
+    (needs:reset)
+    (set phase :playing)
+    (set t 0)))
+
 (fn _G.TIC []
   (set t (+ t 1))
   (cls 0)
@@ -164,23 +172,32 @@
   (print "Digi" 5 5 C false 2)
   (print "Tec" 5 17 C false 2)
 
-  (when (keyp 48) (needs:reset))
+  (case phase 
+    :start
+    (instructions "Can you keep the startup fed?" "<space> to start")
 
-  (if (= nil needs.people)
-      (instructions "Can you keep the startup fed?" "<space> to start")
+    :defeat
+    (instructions "Out of Business!" "<space> to restart")
 
-      (needs:failed?)
-      (instructions "Out of Business!" "<space> to restart")
+    :victory
+    (instructions "Unicorn Exit!" "<space> to restart")
 
-      (> t 60000)
-      (instructions "Unicorn Exit!" "<space> to restart")
+    :playing
+    (do
+      (when (needs:failed?)
+        (sfx 0 "F-4")
+        (set phase :defeat))
 
-      (do
-        (left-panel)
-        (right-panel)
+      (when (> t 60000)
+        (sfx 6)
+        (set phase :victory))
 
-        (when (= 0 (% t 60))
-          (needs:loss)))))
+      (left-panel)
+      (right-panel)
+
+      (when (= 0 (% t 60))
+        (needs:loss)))))
+
 
 ;; <TILES>
 ;; 032:2222222222222222220000002200000022200000022200000022200000022200
@@ -195,10 +212,19 @@
 ;; 000:00000000ffffffff00000000ffffffff
 ;; 001:0123456789abcdeffedcba9876543210
 ;; 002:0123456789abcdef0123456789abcdef
+;; 003:8aceeeeeddca852deedb951ccccb8631
+;; 007:fdca9876543222789987654334678998
+;; 011:00ccbba997654321dc0ba98765432100
 ;; </WAVES>
 
 ;; <SFX>
-;; 000:000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000304000000000
+;; 000:d2e0c2d092c082b072a05290428032502240222022d0222032b04220527052c0626072908200a250c230c220c260d260e280e260f220f220f230f240354000000000
+;; 001:4150417031a021a071c001b0c190f170019001b001f0b100a10081104100010011000110017031c041a001807160a140c110e100f100f100f100f100572000000000
+;; 002:920089507cb06380636053408310a300b300c320c3b0c2b0b370a4409710890079a079a0799079707720810090009320a340b390c360c110e100f000484000000000
+;; 003:7070709060b060d070b090b0b0b0c090d030c030d050e040f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000f000004000000000
+;; 004:80009010b040c090d0a0d0a0b080a080a090a0a0a02090b180c480c670c57083607850605050404c404e304f3041405460768085b0b1e0e1f0f1f01015b000000000
+;; 005:4b705b905bd07be08be09be0bba0cb70eb50eb20db10cb20cb30bb40ab509b609b008b007b207b456b955bd34bf23b013b103b1e5b4d8b6c9bda4ba8364000000000
+;; 006:a210a220923082306240526052704280729092b0a2b0b2c0c2c0a2a09280828082a052c022d012e002f012f042b062909250c240d230e240f260f290167000000000
 ;; </SFX>
 
 ;; <TRACKS>
