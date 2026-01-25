@@ -16,8 +16,7 @@ jobs:
           sudo make install
       - name: export
         run: |
-          tic80 --fs . --cmd="load pet/pet.fnl" --cli
-          tic80 --fs . --cmd="export html pet/pet.fnl alone=1" --cli
+          tic80 --fs .  --cli --cmd="load pet/pet.fnl & export html pet/pet.fnl"
       - uses: actions/upload-artifact@v4
         with:
           name: web-zip
@@ -25,7 +24,7 @@ jobs:
 
   deploy:
     needs: build
-    if: ${{ github.ref_name == 'trunk' }}
+    # if: ${{ github.ref_name == 'trunk' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v5
