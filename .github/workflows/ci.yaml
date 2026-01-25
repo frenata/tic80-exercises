@@ -2,16 +2,7 @@ name: CI/CD
 on:
   - push
 
-# jobs:
-#   tic80:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - run: |
-#           sudo apt update && sudo apt -y install build-essential cmake git libpipewire-0.3-dev libwayland-dev libsdl2-dev ruby-dev libcurl4-openssl-dev libglvnd-dev libglu1-mesa-dev freeglut3-dev
-#           git clone --recursive https://github.com/nesbox/TIC-80 && cd TIC-80/build
-#           cmake -DBUILD_SDLGPU=On -DBUILD_WITH_ALL=On -DBUILD_STATIC=On -DBUILD_PRO=On .. && cmake --build . --parallel
-#           sudo make install
-#
+jobs:
   build:
     runs-on: ubuntu-latest
     steps:
@@ -23,10 +14,6 @@ on:
           git clone --recursive https://github.com/nesbox/TIC-80 && cd TIC-80/build
           cmake -DBUILD_SDLGPU=On -DBUILD_WITH_ALL=On -DBUILD_STATIC=On -DBUILD_PRO=On .. && cmake --build . --parallel
           sudo make install
-      # - name: install tic80
-      #   run: |
-      #     wget https://github.com/nesbox/TIC-80/releases/download/v1.1.2837/tic80-v1.1-linux.deb
-      #     sudo dpkg -i tic80-v1.1-linux.deb
       - name: export
         run: |
           tic80 --fs . --cmd="load pet/pet.fnl" --cli
