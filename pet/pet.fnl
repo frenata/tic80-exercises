@@ -1,8 +1,8 @@
-;; title:   game title
-;; author:  game developer, email, etc.
-;; desc:    short description
-;; site:    website link
-;; license: MIT License (change this to your license of choice)
+;; title:   Feed-a-Startup
+;; author:  Andrew Nichols <andrew@frenata.net>
+;; desc:    Try to keep the startup from dying until it goes unicorn!
+;; site:    www.frenata.net
+;; license: MIT License
 ;; version: 0.1
 ;; script:  fennel
 ;; strict:  true
