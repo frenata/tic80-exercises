@@ -47,7 +47,32 @@
                     (> 0 self.people)
                     (> 0 self.pmf)
                     (> 0 self.funds)))
+       :add (fn [self need val?]
+              (let [inc (or val? 30)]
+              (set (. self need)
+                   (math.min 100 (+ (. self need) inc)))))
        })
+
+(fn button [x y text key f]
+  (let [pressed (keyp key 60 60)
+        shape (if pressed rect rectb)
+        action (if pressed f (fn []))
+        ]
+    (shape x y (+ 4 (* 6 (length text))) 10 C)
+    (print text (+ x 2) (+ y 2) C true)
+    (action)
+  ))
+
+(fn buttons []
+  (button 5 70 "Hire (z)" 26 (fn [] 
+                               (trace "Hire")
+                               (needs:add :people)))
+  (button 5 90 "Research (x)" 24 (fn [] 
+                                   (trace "Research")
+                                   (needs:add :pmf)))
+  (button 5 110 "Fundraise (c)" 3 (fn [] 
+                                    (trace "Fundraise")
+                                    (needs:add :funds))))
 
 
 (var t 0)
@@ -59,6 +84,7 @@
   (if (needs:failed?)
       (print "Failure!" (- (// W 2) 20) (// H 2) C)
       (do
+        (buttons)
         (trib {:col C :x 50 :y 30 :w 180 :h 100})
         (needs:render)
 
