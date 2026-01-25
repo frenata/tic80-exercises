@@ -13,22 +13,16 @@ jobs:
           wget https://github.com/nesbox/TIC-80/releases/download/v1.1.2837/tic80-v1.1-linux.deb
           sudo dpkg -i tic80-v1.1-linux.deb
       - name: export
-        working-directory: pet
         run: |
-          tic80 --fs . --cmd="export html pet.fnl alone=1" --cli
+          tic80 --fs . --cmd="load pet/pet.fnl" --cli
+          tic80 --fs . --cmd="export html pet/pet.fnl alone=1" --cli
       - uses: actions/upload-artifact@v4
         with:
           name: web-zip
           path: pet/pet.fnl.zip
 
-
-# env:
-#   ITCH_USERNAME: my-username
-#   ITCH_GAME_ID: my-game-id
-
   deploy:
     needs: build
-    name: Upload to Itch
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v5
