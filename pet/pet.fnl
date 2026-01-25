@@ -91,9 +91,8 @@
                   (sfx 2 "E-5")
                   (set self.over-cared 5)
                   (cls C))
-                (set (. self need)
-                     (math.min 100 (+ (. self need) inc)))
-                ))
+                (tset self need
+                     (math.min 100 (+ (. self need) inc)))))
        :state (fn [self]
                 (case (min-by [:people :pmf :funds] 
                               (fn [k] (. self k))
