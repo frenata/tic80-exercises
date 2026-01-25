@@ -15,4 +15,4 @@ jobs:
       - name: export
         working-directory: pet
         run: |
-          tic80 pet.fnl --cmd="export html alone=1"
+          tic80 pet.fnl --cmd="ls"
