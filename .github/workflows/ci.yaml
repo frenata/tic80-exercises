@@ -15,4 +15,4 @@ jobs:
       - name: export
         working-directory: pet
         run: |
-          tic80 --cmd="ls --cli"
+          tic80 --cmd="folder --cli"
