@@ -71,13 +71,13 @@
                  (set self.people (- self.people (* 2 rate)))
                  (set self.pmf (- self.pmf (* 4 rate)))
                  (set self.funds (- self.funds (* 6 rate)))))
-       :draw (fn [self x need]
+       :draw (fn [self x need label?]
          (rectb x 15 50 10 C)
          (rect  x 15 (/ (. self need) 2) 10 C)
-         (print need x 5 C))
+         (print (or label? need) x 5 C))
        :render (fn [self]
                  (self:draw 50 :people)
-                 (self:draw 110 :pmf)
+                 (self:draw 110 :pmf "market fit")
                  (self:draw 170 :funds))
        :failed? (fn [self]
                   (or 
@@ -117,15 +117,9 @@
   (print (needs:state) 5 60 C)
 
   ;; Player Buttons
-  (button 5 90 "Hire (z)" 26 (fn [] 
-                               (trace "Hire")
-                               (needs:add :people)))
-  (button 5 105 "Research (x)" 24 (fn [] 
-                                    (trace "Research")
-                                    (needs:add :pmf)))
-  (button 5 120 "Fundraise (c)" 3 (fn [] 
-                                    (trace "Fundraise")
-                                    (needs:add :funds))))
+  (button 5 90 "Hire (z)" 26 (fn [] (needs:add :people)))
+  (button 5 105 "Research (x)" 24 (fn [] (needs:add :pmf)))
+  (button 5 120 "Fundraise (c)" 3 (fn [] (needs:add :funds))))
 
 (fn logo [state]
   (trib {:col C :x 140 :y 80 :w 180 :h 100})
