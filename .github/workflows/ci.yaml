@@ -16,3 +16,23 @@ jobs:
         working-directory: pet
         run: |
           tic80 --fs . --cmd="export html pet.fnl alone=1" --cli
+
+
+# env:
+#   ITCH_USERNAME: my-username
+#   ITCH_GAME_ID: my-game-id
+
+  deploy:
+    needs: build
+    name: Upload to Itch
+    runs-on: ubuntu-latest
+    name: Deploy - Itch.io Web
+    steps:
+      - uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerApiKey: ${{secrets.BUTLER_API_KEY}}
+          gameData: pet.fnl.zip
+          itchUsername: ${{env.ITCH_USERNAME}}
+          itchGameId: '4228853'
+          buildChannel: web
+          buildNumber: $VERSION
