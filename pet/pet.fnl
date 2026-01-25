@@ -55,7 +55,11 @@
 
 ;; State Management
 (local needs 
-       {:people 20 :pmf 30 :funds 100
+       {:reset (fn [self]
+                (set self.people 20)
+                (set self.pmf 40)
+                (set self.funds 80)
+                (set self.over-cared 0))
        :loss (fn [self] 
                (let [rate (if (> self.over-cared 0) 3 1)]
                  (when (> self.over-cared 0) (set self.over-cared (- self.over-cared 1)))
@@ -105,9 +109,6 @@
 
 
 (fn left-panel []
-  ;; Logo
-  (print "Digi" 5 5 C false 2)
-  (print "Tec" 5 17 C false 2)
 
   ;; Message
   (print (needs:state) 5 60 C)
@@ -148,26 +149,38 @@
   (logo (needs:state))
   (needs:render))
 
+(fn instructions [msg sub-msg]
+  (print msg 
+         (- (// W 2) (// (* (length msg) 6) 2)) (- (// H 2) 20) C)
+  (print sub-msg 
+         (- (// W 2) (// (* (length sub-msg) 6) 2)) (- (// H 2) 10) C))
+
 (var t 0)
 (fn _G.TIC []
   (set t (+ t 1))
   (cls 0)
   (rectb 0 0 240 136 C)
 
-  (if (needs:failed?)
-      (print "Failure!" (- (// W 2) 20) (// H 2) C)
+  (print "Digi" 5 5 C false 2)
+  (print "Tec" 5 17 C false 2)
+
+  (when (keyp 48) (needs:reset))
+
+  (if (= nil needs.people)
+      (instructions "Can you keep the startup fed?" "<space> to start")
+
+      (needs:failed?)
+      (instructions "Out of Business!" "<space> to restart")
 
       (> t 60000)
-      (print "Unicorn!" (- (// W 2) 20) (// H 2) C)
+      (instructions "Unicorn Exit!" "<space> to restart")
 
       (do
         (left-panel)
         (right-panel)
 
         (when (= 0 (% t 60))
-          (needs:loss))
-
-        )))
+          (needs:loss)))))
 
 ;; <TILES>
 ;; 032:2222222222222222220000002200000022200000022200000022200000022200
