@@ -57,9 +57,11 @@
 (local needs 
        {:people 20 :pmf 30 :funds 100
        :loss (fn [self] 
-               (set self.people (- self.people 2))
-               (set self.pmf (- self.pmf 4))
-               (set self.funds (- self.funds 6)))
+               (let [rate (if (> self.over-cared 0) 3 1)]
+                 (when (> self.over-cared 0) (set self.over-cared (- self.over-cared 1)))
+                 (set self.people (- self.people (* 2 rate)))
+                 (set self.pmf (- self.pmf (* 4 rate)))
+                 (set self.funds (- self.funds (* 6 rate)))))
        :draw (fn [self x need]
          (rectb x 15 50 10 C)
          (rect  x 15 (/ (. self need) 2) 10 C)
@@ -74,9 +76,14 @@
                     (> 0 self.pmf)
                     (> 0 self.funds)))
        :add (fn [self need val?]
-              (let [inc (or val? 30)]
-              (set (. self need)
-                   (math.min 100 (+ (. self need) inc)))))
+              (let [inc (or val? 30)
+                    new-val (+ (. self need) inc)]
+                (when (> new-val 100)
+                  (set self.over-cared 5)
+                  (cls 1))
+                (set (. self need)
+                     (math.min 100 (+ (. self need) inc)))
+                ))
        :state (fn [self]
                 (case (min-by [:people :pmf :funds] 
                               (fn [k] (. self k))
