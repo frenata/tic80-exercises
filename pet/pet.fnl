@@ -7,13 +7,16 @@
 ;; script:  fennel
 ;; strict:  true
 
+(local fennel (require :fennel))
+
 (local H 136)
 (local W 240)
 (local C 2)
 
+;; Utilities
 (fn trib [{: x : y : w : h : border : bgc : col}]
   (let [border (or border 2)
-        bgc (or bgc 0)]
+               bgc (or bgc 0)]
     (tri x y
          (+ x w) y
          (+ x (/ w 2)) (+ y h)
@@ -22,14 +25,47 @@
     (tri (+ x (* border 2.5)) (+ y border)
          (- (+ x w) (* border 2.5)) (+ y border)
          (+ x (/ w 2)) (- (+ y h) (* border 2))
-         bgc)
-  ))
+         bgc)))
 
+;; State Management
+(local needs 
+       {:people 20 :pmf 30 :funds 100
+       :loss (fn [self] 
+               (set self.people (- self.people 5))
+               (set self.pmf (- self.pmf 10))
+               (set self.funds (- self.funds 15)))
+       :draw (fn [self x need]
+         (rectb x 15 50 10 C)
+         (rect  x 15 (/ (. self need) 2) 10 C)
+         (print need x 5 C))
+       :render (fn [self]
+                 (self:draw 50 :people)
+                 (self:draw 110 :pmf)
+                 (self:draw 170 :funds))
+       :failed? (fn [self]
+                  (or 
+                    (> 0 self.people)
+                    (> 0 self.pmf)
+                    (> 0 self.funds)))
+       })
+
+
+(var t 0)
 (fn _G.TIC []
+  (set t (+ t 1))
   (cls 0)
   (rectb 0 0 240 136 C)
-  (trib {:col C :x 50 :y 20 :w 180 :h 110})
-  )
+
+  (if (needs:failed?)
+      (print "Failure!" (- (// W 2) 20) (// H 2) C)
+      (do
+        (trib {:col C :x 50 :y 30 :w 180 :h 100})
+        (needs:render)
+
+        (when (= 0 (% t 60))
+          (needs:loss))
+
+        )))
 
 ;; <TILES>
 ;; 032:2222222222222222220000002200000022200000022200000022200000022200
