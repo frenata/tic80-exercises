@@ -6,8 +6,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - run: |
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: install tic80
+        run: |
           wget https://github.com/nesbox/TIC-80/releases/download/v1.1.2837/tic80-v1.1-linux.deb
           sudo dpkg -i tic80-v1.1-linux.deb
-          tic80 pet/pet.fnl --cmd="export html alone=1"
+      - name: export
+        working-directory: pet
+        run: |
+          tic80 pet.fnl --cmd="export html alone=1"
