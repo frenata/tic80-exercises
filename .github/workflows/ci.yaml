@@ -7,4 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-        wget https://github.com/nesbox/TIC-80/releases/download/v1.1.2837/tic80-v1.1-linux.deb
+          wget https://github.com/nesbox/TIC-80/releases/download/v1.1.2837/tic80-v1.1-linux.deb
