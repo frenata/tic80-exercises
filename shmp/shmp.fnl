@@ -55,8 +55,23 @@
        :y (+ egg.y (. egg.vec 2))
        :vec egg.vec}))))
 
+(fn background [t]
+  "to give a sense of horizontal movement, a little jank"
+  (let [ b1 (- (% (- 100 t) 1400) 700)
+        b2 (- (% (- 300 t) 1400) 700)
+        b3 (- (% (- 500 t) 1400) 700)
+        b4 (- (% (- 700 t) 1400) 700) ]
+  (for [i -40 256]
+    (line i 0 (+ i 30) 150 
+          (if (> b1 i) 0
+              (> b2 i) 1
+              (> b3 i) 2
+              (> b4 i) 1
+              )))))
+
 (fn _G.TIC []
-  (cls 1)
+  (cls 10)
+  (background t)
   (set t (+ t 1))
 
   (chicken:render t)
