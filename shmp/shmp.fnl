@@ -8,6 +8,11 @@
 ;; strict:  true
 
 (var t 0)
+(var eggs [])
+
+(fn lay-egg [x y vec]
+  {:x x :y y :vec vec})
+
 (local chicken 
        {:x 30 :y 30
         :render (fn [self t]
@@ -26,10 +31,9 @@
                        ty (if (> 5 dy) 5 (> dy 121) 121 dy)]
                    (set self.y ty)))
 
-        :shoot (fn [self]
-                 (when (btnp 4 20)
-                   (sfx 0)
-                   )
+        :shoot (fn [self vec]
+                   (sfx 0 "E-4")
+                   (table.insert eggs (lay-egg self.x self.y vec))
                  )
         })
 
@@ -38,7 +42,18 @@
   (when (btn 1) (player:move-y  1))
   (when (btn 2) (player:move-x -1))
   (when (btn 3) (player:move-x  1))
+  (when (btnp 4 30 20) (player:shoot [2 0]))
+  (when (btnp 5 30 20) (player:shoot [0 2]))
   )
+
+(fn render-eggs [] 
+  (set eggs
+       (icollect [_ egg (ipairs eggs)]
+    (do
+      (elli egg.x egg.y 1 2 13)
+      {:x (+ egg.x (. egg.vec 1))
+       :y (+ egg.y (. egg.vec 2))
+       :vec egg.vec}))))
 
 (fn _G.TIC []
   (cls 1)
@@ -46,6 +61,7 @@
 
   (chicken:render t)
   (controls chicken)
+  (render-eggs eggs)
   )
 
 ;; <TILES>
