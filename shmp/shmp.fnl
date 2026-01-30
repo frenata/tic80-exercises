@@ -12,7 +12,7 @@
 (var t 0)
 (var eggs [])
 (var foxes [])
-(var score 0)
+(var score {:hits 0 :missed 0 :laid 0})
 
 (fn collision-check [buf]
   (var collision nil)
@@ -33,7 +33,7 @@
     (table.remove eggs (. collision 2))
     ; (trace (fennel.view (. foxes (. collision 1))))
     (tset (. foxes (. collision 1)) :dead true)
-    (set score (+ score 1)
+    (set score.hits (+ score.hits 1)
     ; (trace (fennel.view (. foxes (. collision 1))))
     ; (table.remove foxes (. collision 1))
   ; (trace (fennel.view collision))
@@ -45,7 +45,9 @@
     (table.insert 
       foxes 
       {:x 300 :y 120 :vec [-1 0]
-      :render (fn [self] (spr (if self.dead 259 258) self.x self.y 0))
+      :render 
+      (fn [self] (spr (if self.dead 259 258) self.x self.y 0))
+      :dead false
       }
       )))
 
@@ -76,6 +78,7 @@
                 (sfx 0 "E-4")
                 (table.insert eggs 
                               (lay-egg self.x self.y vec))
+                (set score.laid (+ score.laid 1))
                 )
        })
 
@@ -84,33 +87,33 @@
   (var vec-y 2)
 
   (when (btn 0) (player:move-y -1)
-    (set vec-y (- vec-y 1))
-    )
+    (set vec-y (- vec-y 1)))
   (when (btn 1) 
     (player:move-y 1) 
-    (set vec-y (+ vec-y 1))
-    )
+    (set vec-y (+ vec-y 1)))
   (when (btn 2) (player:move-x -1)
-    (set vec-x (- vec-x 1))
-    )
+    (set vec-x (- vec-x 1)))
   (when (btn 3) (player:move-x  1)
-    (set vec-x (+ vec-x 1))
-    )
-  ; (when (btnp 4 30 20) (player:shoot [2 0]))
-  (when (btnp 4 30 20) (player:shoot [vec-x vec-y]))
-  )
+    (set vec-x (+ vec-x 1)))
+  (when (btnp 4 30 20) 
+    (player:shoot [vec-x vec-y])))
 
 
 (fn render-moving [ents]
-       (icollect [_ ent (ipairs ents)]
-         (do
-           ; (trace (fennel.view ent))
-           (: ent :render)
-           (set ent.x (+ ent.x (. ent.vec 1)))
-           (set ent.y (+ ent.y (. ent.vec 2)))
-           ;; TODO: drop the entity when off the screen by too much
-           ent
-           )))
+  (icollect [_ ent (ipairs ents)]
+    (do
+      ; (trace (fennel.view ent))
+      (: ent :render)
+      (set ent.x (+ ent.x (. ent.vec 1)))
+      (set ent.y (+ ent.y (. ent.vec 2)))
+      ;; TODO: drop the entity when off the screen by too much
+      (if (and (> ent.x -50) (< ent.x 350)
+               (> ent.y -50) (< ent.y 200))
+          ent
+          (when (~= ent.dead nil)
+            (set score.missed (+ score.missed 1)))
+          )
+      )))
 
 (fn background [t]
   "to give a sense of horizontal movement, a little jank"
@@ -131,7 +134,9 @@
   (set t (+ t 1))
 
   (background t)
-  (print (.. "Foxes Squashed: " score) 5 5 9)
+  (print (.. "Foxes Squashed: " score.hits) 5 5 9 true)
+  (print (.. "Foxes Missed  : " score.missed) 5 15 9 true)
+  (print (.. "Eggs  Laid    : " score.laid) 5 25 9 true)
 
   (chicken:render t)
   (controls chicken)
