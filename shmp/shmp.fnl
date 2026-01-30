@@ -21,11 +21,18 @@
 
       (when 
         ;; TODO: improve this to use the bounds of the sprites
-        (> buf (+ 
+        ; (> buf (+ 
+        ;       (math.abs (- egg.x fox.x))
+        ;       (math.abs (- egg.y fox.y))))
+        (and
+          (> 2 (- fox.x egg.x))
+          (> 1 (- fox.y egg.y))
+          (< -4 (- fox.x egg.x))
+          (< -3 (- fox.y egg.y))
+          )
 
-              (math.abs (- egg.x fox.x))
-              (math.abs (- egg.y fox.y))))
         (set collision [i j])
+        
       )
     )
   )
