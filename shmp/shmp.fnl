@@ -7,35 +7,48 @@
 ;; script:  fennel
 ;; strict:  true
 
+(local fennel (require :fennel))
 (var t 0)
 (var eggs [])
+(var foxes [])
+
+(fn spawn-fox [t]
+  (when (= 0 (% t 60))
+    (table.insert 
+      foxes 
+      {:x 300 :y 120 :vec [-1 0]
+      :render (fn [self] (spr 258 self.x self.y 0))
+      }
+      )))
 
 (fn lay-egg [x y vec]
-  {:x x :y y :vec vec})
+  {:x x :y y :vec vec
+  :render (fn [self] (elli self.x self.y 1 2 13))
+  })
 
 (local chicken 
        {:x 30 :y 30
-        :render (fn [self t]
-                  (let [frame (% t 20)]
-                    (if (> 10 frame)
-                        (spr 256 self.x self.y 0)
-                        (spr 257 self.x self.y 0)
-                        )))
-        :move-x (fn [self x]
+       :render (fn [self t]
+                 (let [frame (% t 20)]
+                   (if (> 10 frame)
+                       (spr 256 self.x self.y 0)
+                       (spr 257 self.x self.y 0)
+                       )))
+       :move-x (fn [self x]
                  (let [dx (+ self.x x)
-                       tx (if (> 5 dx) 5 (> dx 225) 225 dx)]
+                          tx (if (> 5 dx) 5 (> dx 225) 225 dx)]
                    (set self.x tx)))
 
-        :move-y (fn [self y]
+       :move-y (fn [self y]
                  (let [dy (+ self.y y)
-                       ty (if (> 5 dy) 5 (> dy 121) 121 dy)]
+                          ty (if (> 5 dy) 5 (> dy 121) 121 dy)]
                    (set self.y ty)))
 
-        :shoot (fn [self vec]
-                   (sfx 0 "E-4")
-                   (table.insert eggs (lay-egg self.x self.y vec))
-                 )
-        })
+       :shoot (fn [self vec]
+                (sfx 0 "E-4")
+                (table.insert eggs (lay-egg self.x self.y vec))
+                )
+       })
 
 (fn controls [player] 
   (when (btn 0) (player:move-y -1))
@@ -46,37 +59,42 @@
   (when (btnp 5 30 20) (player:shoot [0 2]))
   )
 
-(fn render-eggs [] 
-  (set eggs
-       (icollect [_ egg (ipairs eggs)]
-    (do
-      (elli egg.x egg.y 1 2 13)
-      {:x (+ egg.x (. egg.vec 1))
-       :y (+ egg.y (. egg.vec 2))
-       :vec egg.vec}))))
+
+(fn render-moving [ents] 
+       (icollect [_ ent (ipairs ents)]
+         (do
+           ; (trace (fennel.view ent))
+           (: ent :render)
+           (set ent.x (+ ent.x (. ent.vec 1)))
+           (set ent.y (+ ent.y (. ent.vec 2)))
+           ent)))
 
 (fn background [t]
   "to give a sense of horizontal movement, a little jank"
   (let [ b1 (- (% (- 100 t) 1400) 700)
-        b2 (- (% (- 300 t) 1400) 700)
-        b3 (- (% (- 500 t) 1400) 700)
-        b4 (- (% (- 700 t) 1400) 700) ]
-  (for [i -40 256]
-    (line i 0 (+ i 30) 150 
-          (if (> b1 i) 0
-              (> b2 i) 1
-              (> b3 i) 2
-              (> b4 i) 1
-              )))))
+            b2 (- (% (- 300 t) 1400) 700)
+            b3 (- (% (- 500 t) 1400) 700)
+            b4 (- (% (- 700 t) 1400) 700) ]
+    (for [i -40 256]
+      (line i 0 (+ i 30) 150 
+            (if (> b1 i) 0
+                (> b2 i) 1
+                (> b3 i) 2
+                (> b4 i) 1
+                )))))
 
 (fn _G.TIC []
   (cls 10)
-  (background t)
   (set t (+ t 1))
+
+  (background t)
 
   (chicken:render t)
   (controls chicken)
-  (render-eggs eggs)
+  (spawn-fox t)
+
+  (set foxes (render-moving foxes))
+  (set eggs (render-moving eggs))
   )
 
 ;; <TILES>
