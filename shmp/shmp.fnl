@@ -74,17 +74,30 @@
 
        :shoot (fn [self vec]
                 (sfx 0 "E-4")
-                (table.insert eggs (lay-egg self.x self.y vec))
+                (table.insert eggs 
+                              (lay-egg self.x self.y vec))
                 )
        })
 
 (fn controls [player] 
-  (when (btn 0) (player:move-y -1))
-  (when (btn 1) (player:move-y  1))
-  (when (btn 2) (player:move-x -1))
-  (when (btn 3) (player:move-x  1))
+  (var vec-x 0)
+  (var vec-y 2)
+
+  (when (btn 0) (player:move-y -1)
+    (set vec-y (- vec-y 1))
+    )
+  (when (btn 1) 
+    (player:move-y 1) 
+    (set vec-y (+ vec-y 1))
+    )
+  (when (btn 2) (player:move-x -1)
+    (set vec-x (- vec-x 1))
+    )
+  (when (btn 3) (player:move-x  1)
+    (set vec-x (+ vec-x 1))
+    )
   ; (when (btnp 4 30 20) (player:shoot [2 0]))
-  (when (btnp 4 30 20) (player:shoot [0 2]))
+  (when (btnp 4 30 20) (player:shoot [vec-x vec-y]))
   )
 
 
