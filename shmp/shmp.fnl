@@ -12,6 +12,31 @@
 (var eggs [])
 (var foxes [])
 
+(fn collision-check [buf]
+  (var collision nil)
+  (icollect [i fox (ipairs foxes)]
+    (icollect [j egg (ipairs eggs)]
+
+      (when 
+        ;; TODO: improve this to use the bounds of the sprites
+        (> buf (+ 
+
+              (math.abs (- egg.x fox.x))
+              (math.abs (- egg.y fox.y))))
+        (set collision [i j])
+      )
+    )
+  )
+  (when collision
+    (table.remove eggs (. collision 2))
+    (trace (fennel.view (. foxes (. collision 1))))
+    (tset (. foxes (. collision 1)) :dead true)
+    (trace (fennel.view (. foxes (. collision 1))))
+    (table.remove foxes (. collision 1))
+  ; (trace (fennel.view collision))
+  )
+  )
+
 (fn spawn-fox [t]
   (when (= 0 (% t 60))
     (table.insert 
@@ -55,19 +80,21 @@
   (when (btn 1) (player:move-y  1))
   (when (btn 2) (player:move-x -1))
   (when (btn 3) (player:move-x  1))
-  (when (btnp 4 30 20) (player:shoot [2 0]))
-  (when (btnp 5 30 20) (player:shoot [0 2]))
+  ; (when (btnp 4 30 20) (player:shoot [2 0]))
+  (when (btnp 4 30 20) (player:shoot [0 2]))
   )
 
 
-(fn render-moving [ents] 
+(fn render-moving [ents]
        (icollect [_ ent (ipairs ents)]
          (do
            ; (trace (fennel.view ent))
            (: ent :render)
            (set ent.x (+ ent.x (. ent.vec 1)))
            (set ent.y (+ ent.y (. ent.vec 2)))
-           ent)))
+           ;; TODO: drop the entity when off the screen by too much
+           ent
+           )))
 
 (fn background [t]
   "to give a sense of horizontal movement, a little jank"
@@ -95,6 +122,7 @@
 
   (set foxes (render-moving foxes))
   (set eggs (render-moving eggs))
+  (collision-check 4)
   )
 
 ;; <TILES>
