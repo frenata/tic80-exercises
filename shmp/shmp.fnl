@@ -32,7 +32,7 @@
     (trace (fennel.view (. foxes (. collision 1))))
     (tset (. foxes (. collision 1)) :dead true)
     (trace (fennel.view (. foxes (. collision 1))))
-    (table.remove foxes (. collision 1))
+    ; (table.remove foxes (. collision 1))
   ; (trace (fennel.view collision))
   )
   )
@@ -42,7 +42,7 @@
     (table.insert 
       foxes 
       {:x 300 :y 120 :vec [-1 0]
-      :render (fn [self] (spr 258 self.x self.y 0))
+      :render (fn [self] (spr (if self.dead 259 258) self.x self.y 0))
       }
       )))
 
@@ -133,6 +133,7 @@
 ;; 000:0000000000777700776667007766674007666775000667700007770000070000
 ;; 001:0000000000777700006667000766674077666775770667707007770000070000
 ;; 002:0000020000002200000022030002233333a33333333333330023333000023330
+;; 003:00000000000000000000000000000000000000000000000000a3112233333333
 ;; </SPRITES>
 
 ;; <WAVES>
