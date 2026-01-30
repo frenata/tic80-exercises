@@ -40,11 +40,12 @@
     (table.remove eggs (. collision 2))
     ; (trace (fennel.view (. foxes (. collision 1))))
     (tset (. foxes (. collision 1)) :dead true)
-    (set score.hits (+ score.hits 1)
+    (set score.hits (+ score.hits 1))
+    (sfx 1)
+
     ; (trace (fennel.view (. foxes (. collision 1))))
     ; (table.remove foxes (. collision 1))
   ; (trace (fennel.view collision))
-  )
   ))
 
 (fn spawn-fox [t]
@@ -169,6 +170,7 @@
 
 ;; <SFX>
 ;; 000:720052a022700270027002801290129022a042a0628082209200d200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200f200324000000000
+;; 001:d000b00070a040a0200000a0000000000090000010004080504050105000506050004000304020201010f000f000f000f000f000f000f000f000f000384000000000
 ;; </SFX>
 
 ;; <TRACKS>
