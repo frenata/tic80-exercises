@@ -8,9 +8,11 @@
 ;; strict:  true
 
 (local fennel (require :fennel))
+
 (var t 0)
 (var eggs [])
 (var foxes [])
+(var score 0)
 
 (fn collision-check [buf]
   (var collision nil)
@@ -29,13 +31,14 @@
   )
   (when collision
     (table.remove eggs (. collision 2))
-    (trace (fennel.view (. foxes (. collision 1))))
+    ; (trace (fennel.view (. foxes (. collision 1))))
     (tset (. foxes (. collision 1)) :dead true)
-    (trace (fennel.view (. foxes (. collision 1))))
+    (set score (+ score 1)
+    ; (trace (fennel.view (. foxes (. collision 1))))
     ; (table.remove foxes (. collision 1))
   ; (trace (fennel.view collision))
   )
-  )
+  ))
 
 (fn spawn-fox [t]
   (when (= 0 (% t 60))
@@ -115,6 +118,7 @@
   (set t (+ t 1))
 
   (background t)
+  (print (.. "Foxes Squashed: " score) 5 5 9)
 
   (chicken:render t)
   (controls chicken)
