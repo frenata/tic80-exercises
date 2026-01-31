@@ -17,22 +17,45 @@ jobs:
       - name: export pet
         run: |
           tic80 --fs .  --cli --cmd="load pet/pet.fnl & export html pet/pet.fnl"
-      - name: export foxhunt
+      - name: export shmp
         run: |
           tic80 --fs .  --cli --cmd="load shmp/shmp.fnl & export html shmp/shmp.fnl"
       - uses: actions/upload-artifact@v4
         with:
-          name: web-zip
-          path: '*.fnl.zip'
+          name: pet-zip
+          path: pet/pet.fnl.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shmp-zip
+          path: shmp/shmp.fnl.zip
 
-  deploy:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      pet:  ${{ steps.filter.outputs.pet }}
+      shmp: ${{ steps.filter.outputs.shmp }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            pet:
+              - 'pet/**'
+            shmp:
+              - 'shmp/**'
+
+  deploy-pet:
     needs: build
-    if: ${{ github.ref_name == 'trunk' }}
+    if: ${{ github.ref_name == 'trunk' && needs.changes.outputs.pet == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v5
         with:
-          name: web-zip
+          name: pet-zip
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}
@@ -41,6 +64,15 @@ jobs:
           itchGameId: virtual-startup
           buildChannel: web
           buildNumber: ${{ github.sha }}
+
+  deploy-shmp:
+    needs: build
+    if: ${{ github.ref_name == 'trunk' && needs.changes.outputs.shmp == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v5
+        with:
+          name: shmp-zip
       - uses: KikimoraGames/itch-publish@v0.0.3
         with:
           butlerApiKey: ${{secrets.BUTLER_API_KEY}}

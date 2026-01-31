@@ -1,6 +1,6 @@
 ;; title:   Fox Busters
 ;; author:  Andrew Nichols <andrew@frenata.net>
-;; desc:    The chickens take revenge on the foxes.
+;; desc:    The chickens take revenge on the foxes!
 ;; site:    www.frenata.net
 ;; license: MIT License
 ;; version: 0.1
