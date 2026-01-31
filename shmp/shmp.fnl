@@ -8,11 +8,14 @@
 ;; strict:  true
 
 (local fennel (require :fennel))
+(local H 136)
+(local W 240)
+(local C 2)
 
 (var t 0)
-(var eggs [])
-(var foxes [])
-(var score {:hits 0 :missed 0 :laid 0})
+(var eggs nil)
+(var foxes nil)
+(var score nil)
 
 (fn collision-check [buf]
   (var collision nil)
@@ -137,11 +140,31 @@
                 (> b4 i) 1
                 )))))
 
-(fn _G.TIC []
-  (cls 10)
-  (set t (+ t 1))
 
-  (background t)
+(var phase :start)
+
+(fn init []
+  (set t 0)
+  (set eggs [])
+  (set foxes [])
+  (set score {:hits 0 :missed 0 :laid 0})
+  (set chicken.x 30)
+  (set chicken.y 30))
+
+
+(fn instructions [msg sub-msg]
+  (print msg 
+         (- (// W 2) (// (* (length msg) 6) 2)) (- (// H 2) 20) C)
+  (print sub-msg 
+         (- (// W 2) (// (* (length sub-msg) 6) 2)) (- (// H 2) 10) C)
+
+  (when (keyp 48)
+    (set phase :playing)
+    (init)
+    ))
+
+
+(fn game []
   (print (.. "Foxes Squashed: " score.hits) 5 5 9 true)
   (print (.. "Foxes Missed  : " score.missed) 5 15 9 true)
   (print (.. "Eggs  Laid    : " score.laid) 5 25 9 true)
@@ -153,7 +176,24 @@
   (set foxes (render-moving foxes))
   (set eggs (render-moving eggs))
   (collision-check 4)
+  (when (> t 6000) (set phase :over))
   )
+
+(fn _G.TIC []
+  (cls C)
+  (set t (+ t 1))
+
+  (background t)
+
+  (case phase 
+    :start
+    (instructions "Lay eggs on the foxes heads!" "<space> to start")
+
+    :over
+    (instructions (.. "Squashed " score.hits " of " (+ score.hits score.missed) " foxes!") "<space> to restart")
+
+    :playing
+    (game)))
 
 ;; <SPRITES>
 ;; 000:0000000000777700776667007766674007666775000667700007770000070000
