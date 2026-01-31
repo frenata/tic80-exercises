@@ -23,9 +23,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: web-zip
-          path: 
-            - pet/pet.fnl.zip
-            - shmp/shmp.fnl.zip
+          path: *.fnl.zip
 
   deploy:
     needs: build
