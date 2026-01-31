@@ -14,13 +14,18 @@ jobs:
           git clone --recursive https://github.com/nesbox/TIC-80 && cd TIC-80/build
           cmake -DBUILD_SDLGPU=On -DBUILD_WITH_ALL=On -DBUILD_STATIC=On -DBUILD_PRO=On .. && cmake --build . --parallel
           sudo make install
-      - name: export
+      - name: export pet
         run: |
           tic80 --fs .  --cli --cmd="load pet/pet.fnl & export html pet/pet.fnl"
+      - name: export foxhunt
+        run: |
+          tic80 --fs .  --cli --cmd="load shmp/shmp.fnl & export html shmp/shmp.fnl"
       - uses: actions/upload-artifact@v4
         with:
           name: web-zip
-          path: pet/pet.fnl.zip
+          path: 
+            - pet/pet.fnl.zip
+            - shmp/shmp.fnl.zip
 
   deploy:
     needs: build
@@ -36,5 +41,13 @@ jobs:
           gameData: pet.fnl.zip
           itchUsername: ${{secrets.ITCH_USERNAME}}
           itchGameId: virtual-startup
+          buildChannel: web
+          buildNumber: ${{ github.sha }}
+      - uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerApiKey: ${{secrets.BUTLER_API_KEY}}
+          gameData: shmp.fnl.zip
+          itchUsername: ${{secrets.ITCH_USERNAME}}
+          itchGameId: fox-busters
           buildChannel: web
           buildNumber: ${{ github.sha }}
