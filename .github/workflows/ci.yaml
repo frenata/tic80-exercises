@@ -49,7 +49,9 @@ jobs:
               - 'shmp/**'
 
   deploy-pet:
-    needs: build
+    needs: 
+      - build
+      - changes
     if: ${{ github.ref_name == 'trunk' && needs.changes.outputs.pet == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -66,7 +68,9 @@ jobs:
           buildNumber: ${{ github.sha }}
 
   deploy-shmp:
-    needs: build
+    needs:
+      - build
+      - changes
     if: ${{ github.ref_name == 'trunk' && needs.changes.outputs.shmp == 'true' }}
     runs-on: ubuntu-latest
     steps:
