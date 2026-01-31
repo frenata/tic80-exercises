@@ -23,7 +23,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: web-zip
-          path: *.fnl.zip
+          path: '*.fnl.zip'
 
   deploy:
     needs: build
